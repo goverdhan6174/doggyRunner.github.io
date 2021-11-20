@@ -65,6 +65,10 @@
     this.images = {};
     this.imagesLoaded = 0;
 
+    //Counter.
+    this.currentCounter = 0;
+    this.counterInterval = null;
+
     if (this.isDisabled()) {
       this.setupDisabledRunner();
     } else {
@@ -123,6 +127,7 @@
     RESOURCE_TEMPLATE_ID: "audio-resources",
     SPEED: 6,
     SPEED_DROP_COEFFICIENT: 3,
+    NUM_COUNT: 3,
   };
 
   /**
@@ -147,6 +152,8 @@
     SNACKBAR: "snackbar",
     SNACKBAR_SHOW: "snackbar-show",
     TOUCH_CONTROLLER: "controller",
+    COUNTER: "counter",
+    COUNT: "count",
   };
 
   /**
@@ -188,7 +195,7 @@
     BUTTON_PRESS: "offline-sound-press",
     HIT: "offline-sound-hit",
     SCORE: "offline-sound-clash",
-    CLASH: "offline-sound-reached",
+    TIMER: "offline-sound-timer",
   };
 
   /**
@@ -503,6 +510,17 @@
           this.startGame.bind(this)
         );
 
+        var counterContainer = document.getElementById(Runner.classes.COUNTER);
+        counterContainer.style.display = "flex";
+        var countsEl = document.getElementsByClassName(Runner.classes.COUNT);
+        var countsArray = Array.prototype.slice.call(countsEl);
+        this.playSound(this.soundFx.TIMER);
+
+        this.counterInterval = setInterval(
+          this.gameDelayCounter.bind(this, countsArray),
+          750
+        );
+
         this.containerEl.style.webkitAnimation = "intro 3s ease-out 1 both";
         this.containerEl.style.width = this.dimensions.WIDTH + "px";
 
@@ -518,6 +536,33 @@
     },
 
     /**
+     * Update Starting Time Counter
+     */
+    gameDelayCounter: function (countElems) {
+      if (typeof this.counter != "number" || this.counter < 1)
+        this.counter = Runner.config.NUM_COUNT + 1;
+
+      this.counter--;
+
+      for (var i = 0; i < Runner.config.NUM_COUNT; i++) {
+        countElems[i].classList.add("hidden");
+        if (countElems[i].getAttribute("data-count") == this.counter) {
+          countElems[i].classList.remove("hidden");
+        }
+      }
+    },
+
+    resetGameDelayCounter: function () {
+      var counterContainer = document.getElementById(Runner.classes.COUNTER);
+      counterContainer.style.display = "none";
+      var countsEl = document.getElementsByClassName(Runner.classes.COUNT);
+      var countsArray = Array.prototype.slice.call(countsEl);
+      for (var i = 0; i < Runner.config.NUM_COUNT; i++) {
+        countsArray[i].classList.add("hidden");
+      }
+    },
+
+    /**
      * Update the game status to started.
      */
     startGame: function () {
@@ -526,6 +571,11 @@
       this.tRex.playingIntro = false;
       this.containerEl.style.webkitAnimation = "";
       this.playCount++;
+
+      if (this.counterInterval) {
+        clearInterval(this.counterInterval);
+        this.resetGameDelayCounter();
+      }
 
       // Handle tabbing off the page. Pause the current game.
       document.addEventListener(
@@ -2288,7 +2338,11 @@
         Cloud.config.MAX_SKY_LEVEL,
         Cloud.config.MIN_SKY_LEVEL
       );
-      this.cloudNum = getRandomNum(1, Cloud.config.NUM_CLOUDS);
+
+      //@TODO:: 2nd Cloud Sprite isn't Align Correctly
+      // this.cloudNum = getRandomNum(0, Cloud.config.NUM_CLOUDS);
+      this.cloudNum = Math.random() > 0.5 ? 0 : 3;
+
       this.draw();
     },
 
@@ -2305,10 +2359,19 @@
         sourceHeight = sourceHeight * 2;
       }
 
+      this.canvasCtx.beginPath();
+      // this.canvasCtx.rect(
+      //   this.xPos,
+      //   this.yPos,
+      //   Cloud.config.WIDTH,
+      //   Cloud.config.HEIGHT
+      // );
+      this.canvasCtx.stroke();
+
       this.canvasCtx.drawImage(
         Runner.imageSprite,
         this.spritePos.x,
-        this.spritePos.y * this.cloudNum,
+        this.spritePos.y + this.cloudNum * Cloud.config.HEIGHT,
         sourceWidth,
         sourceHeight,
         this.xPos,
