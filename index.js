@@ -136,7 +136,7 @@
    */
   Runner.defaultDimensions = {
     WIDTH: DEFAULT_WIDTH,
-    HEIGHT: 150,
+    HEIGHT: 300,
   };
 
   /**
@@ -312,28 +312,28 @@
      * Load and decode base 64 encoded sounds.
      */
     loadSounds: function () {
-      if (!IS_IOS) {
-        this.audioContext = new AudioContext();
+      // if (!IS_IOS) {
+      this.audioContext = new AudioContext();
 
-        var resourceTemplate = document.getElementById(
-          this.config.RESOURCE_TEMPLATE_ID
-        ).content;
+      var resourceTemplate = document.getElementById(
+        this.config.RESOURCE_TEMPLATE_ID
+      ).content;
 
-        for (var sound in Runner.sounds) {
-          var soundSrc = resourceTemplate.getElementById(Runner.sounds[sound])
-            .src;
-          soundSrc = soundSrc.substr(soundSrc.indexOf(",") + 1);
-          var buffer = decodeBase64ToArrayBuffer(soundSrc);
+      for (var sound in Runner.sounds) {
+        var soundSrc = resourceTemplate.getElementById(Runner.sounds[sound])
+          .src;
+        soundSrc = soundSrc.substr(soundSrc.indexOf(",") + 1);
+        var buffer = decodeBase64ToArrayBuffer(soundSrc);
 
-          // Async, so no guarantee of order in array.
-          this.audioContext.decodeAudioData(
-            buffer,
-            function (index, audioData) {
-              this.soundFx[index] = audioData;
-            }.bind(this, sound)
-          );
-        }
+        // Async, so no guarantee of order in array.
+        this.audioContext.decodeAudioData(
+          buffer,
+          function (index, audioData) {
+            this.soundFx[index] = audioData;
+          }.bind(this, sound)
+        );
       }
+      // }
     },
 
     /**
@@ -1587,7 +1587,7 @@
       type: "CACTUS_SMALL",
       width: 17,
       height: 35,
-      yPos: 105,
+      yPos: 255,
       multipleSpeed: 4,
       minGap: 120,
       minSpeed: 0,
@@ -1601,7 +1601,7 @@
       type: "CACTUS_LARGE",
       width: 25,
       height: 50,
-      yPos: 90,
+      yPos: 240,
       multipleSpeed: 7,
       minGap: 120,
       minSpeed: 0,
@@ -1617,8 +1617,8 @@
       type: "PTERODACTYL",
       width: 46,
       height: 40,
-      yPos: [100, 75, 50], // Variable height.
-      yPosMobile: [100, 50], // Variable height mobile.
+      yPos: [250, 225, 200], // Variable height.
+      yPosMobile: [250, 200], // Variable height mobile.
       multipleSpeed: 999,
       minSpeed: 8.5,
       minGap: 150,
@@ -2325,7 +2325,7 @@
     MAX_CLOUD_GAP: 400,
     MAX_SKY_LEVEL: 30,
     MIN_CLOUD_GAP: 100,
-    MIN_SKY_LEVEL: 71,
+    MIN_SKY_LEVEL: 150,
     WIDTH: 46,
   };
 
@@ -2617,7 +2617,7 @@
   HorizonLine.dimensions = {
     WIDTH: 600,
     HEIGHT: 12,
-    YPOS: 127,
+    YPOS: 277,
   };
 
   HorizonLine.prototype = {
